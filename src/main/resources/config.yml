@@ -1,0 +1,945 @@
+# WSMP-Classes configuration
+#
+# Every ability is a real vanilla mechanic (potion effects, real extra
+# arrows, real Ender Pearl damage) triggered off a real vanilla action —
+# never an invented effect. See AbilityService in code for the 11 reusable
+# ability behaviors every node below is built from; "upgrade" nodes are the
+# same behavior with bigger numbers, not new code.
+#
+# TREE SHAPE (same for all three classes): 5 independent root nodes (1 point
+# each) -> one upgrade per root (3 points each) -> one capstone requiring the
+# original 3 "core identity" upgrades only, not the 2 side branches (5
+# points) -> plus 2 standalone PASSIVE STAT BUFFS with no prerequisites,
+# investable repeatedly (0-5 points each) instead of being a single unlock.
+#
+# The two buff nodes (a proc-chance booster and a max-health booster, one
+# pair per class) aren't triggered abilities at all — no chance roll, no
+# cooldown, no proc message. Each point is a permanent, always-on bonus:
+# STAT_PROC_CHANCE_BOOST multiplies the trigger chance of every OTHER
+# ability this player has, and STAT_MAX_HEALTH_BOOST applies a real vanilla
+# max-health attribute modifier. Not everything in this tree has to be
+# something you "use" — some of it is just being a little bit better at
+# everything else.
+#
+# Investing in every single node in one class's tree — every root, every
+# upgrade, the capstone, and maxing both buff nodes — costs 25 + 5 + 5 = 35
+# points. The most anyone can ever earn is 19 (1 point per 5 levels, level
+# 99). That gap is deliberate: nobody can max out a whole tree, so which
+# roots you unlock, which upgrades you push, and how much you sink into the
+# passive buffs instead is a real, lasting build choice (lasting until you
+# pay for a respec — see settings below).
+
+settings:
+  points-per-level-interval: 5
+  respec-cost: 5000.0
+  class-change-cost: 15000.0
+  respec-cooldown-days: 7
+  class-change-cooldown-days: 7
+  guide-book-cooldown-hours: 24
+  pvp-xp-per-damage: 2.0
+  pve-xp-per-damage: 0.3
+  pvp-kill-bonus-xp: 50.0
+
+  # Mage's base spell kit — always available from level 1, never gated by
+  # the tree (right-click a Blaze Rod for Fireball, shift-right-click for
+  # Lightning; thrown Snowballs are automatically enhanced into Iceballs).
+  # The mage_fireball/mage_meteor/mage_archmages_wrath tree nodes make these
+  # cheaper and stronger — they never unlock access from scratch.
+  mana-max: 100.0
+  mana-regen-amount: 5.0
+  mana-regen-interval-seconds: 2
+  fireball-mana-cost: 25.0
+  fireball-base-damage: 5.0
+  fireball-cooldown-seconds: 3
+  lightning-mana-cost: 50.0
+  lightning-base-damage: 8.0
+  lightning-cooldown-seconds: 8
+  iceball-bonus-damage: 2.0
+  iceball-slowness-seconds: 3.0
+  iceball-cooldown-seconds: 2
+
+nodes:
+
+  # ============================================================ WARRIOR
+  warrior_whirlwind:
+    class: WARRIOR
+    display: "&cWhirlwind Training"
+    description: "Increases Whirlwind Strike's damage and reduces its mana cost. Whirlwind Strike itself is always available — right-click any sword."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: NETHERITE_AXE
+    ability: WHIRLWIND_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 20
+      mana-cost-reduction-percent: 10
+
+  warrior_battle_instinct:
+    class: WARRIOR
+    display: "&cBattle Instinct"
+    description: "Melee hits have a chance to grant you Strength I briefly."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: IRON_SWORD
+    ability: ON_HIT_SELF_POTION_PROC
+    chance: 0.10
+    cooldown-seconds: 8
+    params:
+      amplifier: 0
+      duration-seconds: 5
+    string-params:
+      effect: STRENGTH
+
+  warrior_bone_breaker:
+    class: WARRIOR
+    display: "&cBone Breaker"
+    description: "Melee hits have a chance to Slow the target and knock them back hard."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: IRON_AXE
+    ability: ON_HIT_TARGET_POTION_PROC
+    chance: 0.15
+    cooldown-seconds: 6
+    params:
+      amplifier: 0
+      duration-seconds: 3
+      knockback-multiplier: 1.2
+    string-params:
+      effect: SLOWNESS
+
+  warrior_second_wind:
+    class: WARRIOR
+    display: "&cSecond Wind"
+    description: "Below 50% health, gain Regeneration II (45s cooldown)."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: TOTEM_OF_UNDYING
+    ability: ON_LOW_HEALTH_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 45
+    params:
+      health-threshold-percent: 50
+      amplifier: 1
+      duration-seconds: 5
+    string-params:
+      effect: REGENERATION
+
+  warrior_iron_skin:
+    class: WARRIOR
+    display: "&cIron Skin"
+    description: "Taking damage has a chance to grant Resistance I briefly."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: IRON_CHESTPLATE
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 10
+    params:
+      amplifier: 0
+      duration-seconds: 4
+    string-params:
+      effect: RESISTANCE
+
+  warrior_bloodlust:
+    class: WARRIOR
+    display: "&cBloodlust"
+    description: "Landing a killing blow grants Strength I and Speed I."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: REDSTONE
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 0
+      duration-seconds: 6
+      amplifier2: 0
+      duration2-seconds: 6
+    string-params:
+      effect: STRENGTH
+      effect2: SPEED
+
+  warrior_berserker_rage:
+    class: WARRIOR
+    display: "&6Berserker Rage"
+    description: "Upgrades Battle Instinct — higher chance, Strength II."
+    cost: 3
+    prerequisites: [warrior_battle_instinct]
+    min-level: 35
+    icon: DIAMOND_SWORD
+    ability: ON_HIT_SELF_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 8
+    params:
+      amplifier: 1
+      duration-seconds: 6
+    string-params:
+      effect: STRENGTH
+
+  warrior_reckless_slam:
+    class: WARRIOR
+    display: "&6Reckless Slam"
+    description: "Upgrades Bone Breaker — higher chance, Slowness II, bigger knockback."
+    cost: 3
+    prerequisites: [warrior_bone_breaker]
+    min-level: 35
+    icon: DIAMOND_AXE
+    ability: ON_HIT_TARGET_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 6
+    params:
+      amplifier: 1
+      duration-seconds: 4
+      knockback-multiplier: 1.8
+    string-params:
+      effect: SLOWNESS
+
+  warrior_undying_rage:
+    class: WARRIOR
+    display: "&6Undying Rage"
+    description: "Upgrades Second Wind — Regeneration III plus Absorption hearts."
+    cost: 3
+    prerequisites: [warrior_second_wind]
+    min-level: 35
+    icon: GOLDEN_APPLE
+    ability: ON_LOW_HEALTH_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 45
+    params:
+      health-threshold-percent: 50
+      amplifier: 2
+      duration-seconds: 6
+      absorption-hearts: 2
+      absorption-duration-seconds: 8
+    string-params:
+      effect: REGENERATION
+
+  warrior_stone_skin:
+    class: WARRIOR
+    display: "&6Stone Skin"
+    description: "Upgrades Iron Skin — higher chance, Resistance II."
+    cost: 3
+    prerequisites: [warrior_iron_skin]
+    min-level: 35
+    icon: DIAMOND_CHESTPLATE
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.25
+    cooldown-seconds: 10
+    params:
+      amplifier: 1
+      duration-seconds: 5
+    string-params:
+      effect: RESISTANCE
+
+  warrior_rampage:
+    class: WARRIOR
+    display: "&6Rampage"
+    description: "Upgrades Bloodlust — Strength II and Speed II on a kill."
+    cost: 3
+    prerequisites: [warrior_bloodlust]
+    min-level: 35
+    icon: BLAZE_POWDER
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 1
+      duration-seconds: 7
+      amplifier2: 1
+      duration2-seconds: 7
+    string-params:
+      effect: STRENGTH
+      effect2: SPEED
+
+  warrior_greater_whirlwind:
+    class: WARRIOR
+    display: "&6Greater Whirlwind"
+    description: "Upgrades Whirlwind Training — significantly more damage and a bigger radius."
+    cost: 3
+    prerequisites: [warrior_whirlwind]
+    min-level: 35
+    icon: NETHERITE_SWORD
+    ability: WHIRLWIND_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 45
+      mana-cost-reduction-percent: 25
+      extra-radius: 1.5
+
+  warrior_warlords_fury:
+    class: WARRIOR
+    display: "&5&lWarlord's Fury"
+    description: "Capstone — melee hits have a big chance to grant Strength III."
+    cost: 5
+    prerequisites: []
+    capstone: true
+    min-level: 70
+    icon: NETHERITE_SWORD
+    ability: ON_HIT_SELF_POTION_PROC
+    chance: 0.30
+    cooldown-seconds: 6
+    params:
+      amplifier: 2
+      duration-seconds: 6
+    string-params:
+      effect: STRENGTH
+
+  # ============================================================ MAGE
+  mage_fireball:
+    class: MAGE
+    display: "&bFireball Training"
+    description: "Increases Fireball's damage and reduces its mana cost. Fireball itself is always available — right-click a Blaze Rod."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: FIRE_CHARGE
+    ability: FIREBALL_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 20
+      mana-cost-reduction-percent: 10
+
+  mage_void_step:
+    class: MAGE
+    display: "&bVoid Step"
+    description: "Landing an Ender Pearl throw has a chance to grant brief Speed."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: ENDER_PEARL
+    ability: PEARL_LANDING_PROC
+    chance: 0.60
+    cooldown-seconds: 10
+    params:
+      self-amplifier: 1
+      self-duration-seconds: 3
+    string-params:
+      self-effect: SPEED
+
+  mage_mana_shield:
+    class: MAGE
+    display: "&bMana Shield"
+    description: "Below 30% health, gain Regeneration and Absorption hearts (45s cooldown)."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: SHIELD
+    ability: ON_LOW_HEALTH_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 45
+    params:
+      health-threshold-percent: 30
+      amplifier: 0
+      duration-seconds: 5
+      absorption-hearts: 2
+      absorption-duration-seconds: 8
+    string-params:
+      effect: REGENERATION
+
+  mage_arcane_ward:
+    class: MAGE
+    display: "&bArcane Ward"
+    description: "Taking damage has a chance to grant Resistance I briefly."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: AMETHYST_SHARD
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.15
+    cooldown-seconds: 12
+    params:
+      amplifier: 0
+      duration-seconds: 4
+    string-params:
+      effect: RESISTANCE
+
+  mage_soul_harvest:
+    class: MAGE
+    display: "&bSoul Harvest"
+    description: "Landing a killing blow grants Regeneration I and Speed I."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: GHAST_TEAR
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 0
+      duration-seconds: 5
+      amplifier2: 0
+      duration2-seconds: 5
+    string-params:
+      effect: REGENERATION
+      effect2: SPEED
+
+  mage_meteor:
+    class: MAGE
+    display: "&dMeteor"
+    description: "Upgrades Fireball Training — significantly more damage and mana efficiency."
+    cost: 3
+    prerequisites: [mage_fireball]
+    min-level: 35
+    icon: MAGMA_CREAM
+    ability: FIREBALL_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 45
+      mana-cost-reduction-percent: 25
+
+  mage_blink_strike:
+    class: MAGE
+    display: "&dBlink Strike"
+    description: "Upgrades Void Step — also deals real damage to the nearest enemy on landing."
+    cost: 3
+    prerequisites: [mage_void_step]
+    min-level: 35
+    icon: ENDER_EYE
+    ability: PEARL_LANDING_PROC
+    chance: 0.60
+    cooldown-seconds: 10
+    params:
+      self-amplifier: 1
+      self-duration-seconds: 3
+      nearby-damage: 4
+      nearby-radius: 3
+      target-amplifier: 0
+      target-duration-seconds: 3
+    string-params:
+      self-effect: SPEED
+      target-effect: WEAKNESS
+
+  mage_archmages_focus:
+    class: MAGE
+    display: "&dArchmage's Focus"
+    description: "Upgrades Mana Shield — bigger Regeneration and more Absorption."
+    cost: 3
+    prerequisites: [mage_mana_shield]
+    min-level: 35
+    icon: ENCHANTED_GOLDEN_APPLE
+    ability: ON_LOW_HEALTH_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 45
+    params:
+      health-threshold-percent: 30
+      amplifier: 1
+      duration-seconds: 6
+      absorption-hearts: 4
+      absorption-duration-seconds: 10
+    string-params:
+      effect: REGENERATION
+
+  mage_spell_shield:
+    class: MAGE
+    display: "&dSpell Shield"
+    description: "Upgrades Arcane Ward — higher chance, Resistance II."
+    cost: 3
+    prerequisites: [mage_arcane_ward]
+    min-level: 35
+    icon: AMETHYST_CLUSTER
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 12
+    params:
+      amplifier: 1
+      duration-seconds: 5
+    string-params:
+      effect: RESISTANCE
+
+  mage_soul_reaper:
+    class: MAGE
+    display: "&dSoul Reaper"
+    description: "Upgrades Soul Harvest — Regeneration II and Speed II on a kill."
+    cost: 3
+    prerequisites: [mage_soul_harvest]
+    min-level: 35
+    icon: NETHER_STAR
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 1
+      duration-seconds: 6
+      amplifier2: 1
+      duration2-seconds: 6
+    string-params:
+      effect: REGENERATION
+      effect2: SPEED
+
+  mage_archmages_wrath:
+    class: MAGE
+    display: "&5&lArchmage's Wrath"
+    description: "Capstone — Lightning strikes a wider area and deals much more damage."
+    cost: 5
+    prerequisites: []
+    capstone: true
+    min-level: 70
+    icon: DRAGON_BREATH
+    ability: LIGHTNING_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 60
+      mana-cost-reduction-percent: 20
+      extra-radius: 2
+
+  # ============================================================ ARCHER
+  archer_power_shot:
+    class: ARCHER
+    display: "&2Marksman Training"
+    description: "Increases Power Shot's damage and reduces its mana cost. Power Shot itself is always available — right-click a Spectral Arrow."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: SPECTRAL_ARROW
+    ability: POWERSHOT_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 20
+      mana-cost-reduction-percent: 10
+
+  archer_steady_aim:
+    class: ARCHER
+    display: "&aSteady Aim"
+    description: "Bow shots have a chance to deal bonus real damage."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: BOW
+    ability: BOW_BONUS_DAMAGE_PROC
+    chance: 0.15
+    cooldown-seconds: 6
+    params:
+      bonus-damage: 2
+
+  archer_hunters_mark:
+    class: ARCHER
+    display: "&aHunter's Mark"
+    description: "Bow hits have a chance to Slow the target."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: TIPPED_ARROW
+    ability: ON_HIT_TARGET_POTION_PROC
+    chance: 0.15
+    cooldown-seconds: 6
+    params:
+      amplifier: 0
+      duration-seconds: 3
+      knockback-multiplier: 0
+    string-params:
+      effect: SLOWNESS
+
+  archer_volley:
+    class: ARCHER
+    display: "&aVolley"
+    description: "Bow shots have a chance to also fire 2 extra real arrows."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: ARROW
+    ability: BOW_MULTISHOT_PROC
+    chance: 0.10
+    cooldown-seconds: 10
+    params:
+      extra-arrows: 2
+      spread-degrees: 8
+
+  archer_evasion:
+    class: ARCHER
+    display: "&aEvasion"
+    description: "Taking damage has a chance to grant Speed I briefly."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: FEATHER
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 10
+    params:
+      amplifier: 0
+      duration-seconds: 3
+    string-params:
+      effect: SPEED
+
+  archer_killer_instinct:
+    class: ARCHER
+    display: "&aKiller Instinct"
+    description: "Landing a killing blow grants Speed II and Strength I."
+    cost: 1
+    prerequisites: []
+    min-level: 1
+    icon: RABBIT_FOOT
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 1
+      duration-seconds: 6
+      amplifier2: 0
+      duration2-seconds: 6
+    string-params:
+      effect: SPEED
+      effect2: STRENGTH
+
+  archer_deadeye:
+    class: ARCHER
+    display: "&6Deadeye"
+    description: "Upgrades Steady Aim — higher chance, more bonus damage."
+    cost: 3
+    prerequisites: [archer_steady_aim]
+    min-level: 35
+    icon: SPECTRAL_ARROW
+    ability: BOW_BONUS_DAMAGE_PROC
+    chance: 0.20
+    cooldown-seconds: 6
+    params:
+      bonus-damage: 4
+
+  archer_piercing_shot:
+    class: ARCHER
+    display: "&6Piercing Shot"
+    description: "Upgrades Hunter's Mark — higher chance, Weakness instead."
+    cost: 3
+    prerequisites: [archer_hunters_mark]
+    min-level: 35
+    icon: CROSSBOW
+    ability: ON_HIT_TARGET_POTION_PROC
+    chance: 0.20
+    cooldown-seconds: 6
+    params:
+      amplifier: 1
+      duration-seconds: 4
+      knockback-multiplier: 0
+    string-params:
+      effect: WEAKNESS
+
+  archer_rain_of_arrows:
+    class: ARCHER
+    display: "&6Rain of Arrows"
+    description: "Upgrades Volley — 4 extra arrows, higher chance."
+    cost: 3
+    prerequisites: [archer_volley]
+    min-level: 35
+    icon: TIPPED_ARROW
+    ability: BOW_MULTISHOT_PROC
+    chance: 0.15
+    cooldown-seconds: 10
+    params:
+      extra-arrows: 4
+      spread-degrees: 10
+
+  archer_swift_retreat:
+    class: ARCHER
+    display: "&6Swift Retreat"
+    description: "Upgrades Evasion — higher chance, Speed II."
+    cost: 3
+    prerequisites: [archer_evasion]
+    min-level: 35
+    icon: SUGAR
+    ability: ON_TAKE_DAMAGE_SELF_POTION_PROC
+    chance: 0.25
+    cooldown-seconds: 10
+    params:
+      amplifier: 1
+      duration-seconds: 4
+    string-params:
+      effect: SPEED
+
+  archer_predators_focus:
+    class: ARCHER
+    display: "&6Predator's Focus"
+    description: "Upgrades Killer Instinct — Speed III and Strength II on a kill."
+    cost: 3
+    prerequisites: [archer_killer_instinct]
+    min-level: 35
+    icon: PHANTOM_MEMBRANE
+    ability: ON_KILL_SELF_POTION_PROC
+    chance: 1.0
+    cooldown-seconds: 20
+    params:
+      amplifier: 2
+      duration-seconds: 7
+      amplifier2: 1
+      duration2-seconds: 7
+    string-params:
+      effect: SPEED
+      effect2: STRENGTH
+
+  archer_piercing_volley:
+    class: ARCHER
+    display: "&6Piercing Volley"
+    description: "Upgrades Marksman Training — significantly more Power Shot damage and mana efficiency."
+    cost: 3
+    prerequisites: [archer_power_shot]
+    min-level: 35
+    icon: TIPPED_ARROW
+    ability: POWERSHOT_UPGRADE
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-bonus-percent: 45
+      mana-cost-reduction-percent: 25
+
+  archer_master_marksman:
+    class: ARCHER
+    display: "&5&lMaster Marksman"
+    description: "Capstone — bow shots almost always deal a big bonus damage burst."
+    cost: 5
+    prerequisites: []
+    capstone: true
+    min-level: 70
+    icon: NETHERITE_INGOT
+    ability: BOW_BONUS_DAMAGE_PROC
+    chance: 0.60
+    cooldown-seconds: 8
+    params:
+      bonus-damage: 6
+
+  # ============================================================ PASSIVE STAT BUFFS
+  # These aren't triggered abilities at all — no chance roll, no cooldown,
+  # no proc message. Each point invested is a permanent, always-on bonus via
+  # a real vanilla attribute modifier (max health) or a global multiplier
+  # applied inside AbilityService's roll (proc chance). max-points lets a
+  # node be invested in repeatedly (0-5) instead of being a single unlock,
+  # at "cost" points EACH time — so maxing one of these costs 5x its cost,
+  # not once. No prerequisites: these stand alone from the ability branches.
+
+  warrior_battle_hardened:
+    class: WARRIOR
+    display: "&6Battle Hardened"
+    description: "Passively boosts the trigger chance of all your other Warrior abilities."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: NETHERITE_INGOT
+    ability: STAT_PROC_CHANCE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 2
+
+  warrior_vitality:
+    class: WARRIOR
+    display: "&6Vitality"
+    description: "Passively increases your max health."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: APPLE
+    ability: STAT_MAX_HEALTH_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      hearts-per-point: 0.5
+
+  mage_arcane_efficiency:
+    class: MAGE
+    display: "&dArcane Efficiency"
+    description: "Passively boosts the trigger chance of all your other Mage abilities."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: LAPIS_LAZULI
+    ability: STAT_PROC_CHANCE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 2
+
+  mage_vitality:
+    class: MAGE
+    display: "&dVitality"
+    description: "Passively increases your max health."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: GLISTERING_MELON_SLICE
+    ability: STAT_MAX_HEALTH_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      hearts-per-point: 0.5
+
+  archer_precision:
+    class: ARCHER
+    display: "&2Precision"
+    description: "Passively boosts the trigger chance of all your other Archer abilities."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SPYGLASS
+    ability: STAT_PROC_CHANCE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 2
+
+  archer_vitality:
+    class: ARCHER
+    display: "&2Vitality"
+    description: "Passively increases your max health."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: GOLDEN_CARROT
+    ability: STAT_MAX_HEALTH_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      hearts-per-point: 0.5
+
+  # ---- Speed / Defence / Attack buffs, one set per class (same numbers,
+  # same behaviors — only the flavor text and icon differ by class).
+
+  warrior_swiftness:
+    class: WARRIOR
+    display: "&6Swiftness"
+    description: "Passively increases your movement speed."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SUGAR
+    ability: STAT_MOVEMENT_SPEED_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 3
+
+  warrior_fortitude:
+    class: WARRIOR
+    display: "&6Fortitude"
+    description: "Passively increases your armor."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SHIELD
+    ability: STAT_ARMOR_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      armor-per-point: 1
+
+  warrior_might:
+    class: WARRIOR
+    display: "&6Might"
+    description: "Passively increases your melee attack damage."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: IRON_INGOT
+    ability: STAT_ATTACK_DAMAGE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-per-point: 0.4
+
+  mage_swiftness:
+    class: MAGE
+    display: "&dSwiftness"
+    description: "Passively increases your movement speed."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SUGAR
+    ability: STAT_MOVEMENT_SPEED_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 3
+
+  mage_fortitude:
+    class: MAGE
+    display: "&dFortitude"
+    description: "Passively increases your armor."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SHIELD
+    ability: STAT_ARMOR_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      armor-per-point: 1
+
+  mage_might:
+    class: MAGE
+    display: "&dMight"
+    description: "Passively increases your melee attack damage."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: IRON_INGOT
+    ability: STAT_ATTACK_DAMAGE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-per-point: 0.4
+
+  archer_swiftness:
+    class: ARCHER
+    display: "&2Swiftness"
+    description: "Passively increases your movement speed."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SUGAR
+    ability: STAT_MOVEMENT_SPEED_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      percent-per-point: 3
+
+  archer_fortitude:
+    class: ARCHER
+    display: "&2Fortitude"
+    description: "Passively increases your armor."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: SHIELD
+    ability: STAT_ARMOR_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      armor-per-point: 1
+
+  archer_might:
+    class: ARCHER
+    display: "&2Might"
+    description: "Passively increases your melee attack damage."
+    cost: 1
+    max-points: 5
+    prerequisites: []
+    min-level: 1
+    icon: IRON_INGOT
+    ability: STAT_ATTACK_DAMAGE_BOOST
+    chance: 1.0
+    cooldown-seconds: 0
+    params:
+      damage-per-point: 0.4
